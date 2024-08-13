@@ -1,5 +1,5 @@
 package test;
-
+//vlladdd
  /* 
 public class Tile {
     public final char  char_letter;
