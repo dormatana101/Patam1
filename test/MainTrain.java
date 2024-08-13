@@ -1,11 +1,10 @@
 package test;
 
-//import test.Tile.Bag;
+import test.Tile.Bag;
 
 public class MainTrain {
 	
-	 public static void testBag() {
-		/* 
+	 public static void testBag() { 
 	 	Bag b=Tile.Bag.getBag();
 	 	Bag b1=Tile.Bag.getBag();
 	 	if(b1!=b)
@@ -48,7 +47,6 @@ public class MainTrain {
 	 		i++;
 	 	}
 	 	return ts;
-		 */
 	 }
 	
 	

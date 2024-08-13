@@ -1,0 +1,91 @@
+package test;
+import java.util.Objects;
+import java.util.Random;
+public class Tile {
+    public final char char_letter;
+    public final int int_score;
+    private Tile(char char_letter ,int int_score){
+        this.char_letter = char_letter;
+        this.int_score = int_score;
+    }
+    public static Tile createTile(char letter, int score) {
+        return new Tile(letter, score);
+    }
+    @Override
+    public boolean equals(Object obj){
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            Tile tile = (Tile) obj; // Cast to Tile
+            // Compare the fields for equality
+            return char_letter == tile.char_letter && int_score == tile.int_score;
+        
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(char_letter, int_score);
+    }
+	
+    public class Bag{
+        public int[] Letters ;
+        public Tile[] Tiles ;
+        public Bag(){
+            this.Letters = new int[] {9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
+            this.Tiles = new Tile[] {createTile('A', 1),createTile('B', 3),createTile('C', 1),createTile('D', 2),createTile('E', 1),createTile('F', 4),createTile('G', 2),createTile('H', 4),createTile('I', 1),createTile('J', 8),createTile('K', 5),createTile('L', 1),createTile('M', 3),createTile('N', 1),createTile('O', 1),createTile('P', 3),createTile('Q', 10),createTile('R', 1),createTile('S', 1),createTile('T', 3),createTile('U', 1),createTile('V', 4),createTile('W', 4),createTile('X', 8),createTile('Y', 4),createTile('Z', 10)};
+
+        }
+        public static int[] getBag() {
+            return new int[]{1, 2, 3, 4, 5};
+        }
+        public Tile getRand(){
+            boolean flag = true;
+            for (int letter : Letters) {
+                if(letter!=0)
+                    flag=false;
+            }
+            if(flag)
+                return null;
+            Random random = new Random();
+            int randomLetter = random.nextInt(26);
+            if(this.Letters[randomLetter]==0) return null;
+            else{
+                this.Letters[randomLetter]=--this.Letters[randomLetter];
+                return this.Tiles[randomLetter];
+            }
+            
+        }
+        public Tile getTile(char c){
+            boolean flag = true;
+            for (int letter : Letters) {
+                if(letter!=0)
+                    flag=false;
+            }
+            if(flag)
+                return null;
+            int index_letter= c-'A';
+            if(this.Letters[index_letter]!=0)
+            {
+                this.Letters[index_letter]=--this.Letters[index_letter];
+                return this.Tiles[index_letter];
+            }
+            else
+            {
+                return null;
+            }     
+        }
+        public void put(Tile t){
+            int [] Letters_clone = new int[] {9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
+            int index_letter= t.char_letter-'A';
+            if(this.Letters[index_letter]!=Letters_clone[index_letter])
+            {
+                this.Letters[index_letter]++;
+            }
+        }
+        public int size(){
+            int count=0;
+            for (int x : Letters) {
+                count+=x;
+            }
+            return count;
+        }
+    }
+}
