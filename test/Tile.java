@@ -25,16 +25,23 @@ public class Tile {
         return Objects.hash(char_letter, int_score);
     }
 	
-    public class Bag{
+    public static class Bag{
         public int[] Letters ;
         public Tile[] Tiles ;
-        public Bag(){
+        private static Bag bag = null;
+        private Bag(){
             this.Letters = new int[] {9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2, 6, 8, 2, 1, 6, 4, 6, 4, 2, 2, 1, 2, 1};
             this.Tiles = new Tile[] {createTile('A', 1),createTile('B', 3),createTile('C', 1),createTile('D', 2),createTile('E', 1),createTile('F', 4),createTile('G', 2),createTile('H', 4),createTile('I', 1),createTile('J', 8),createTile('K', 5),createTile('L', 1),createTile('M', 3),createTile('N', 1),createTile('O', 1),createTile('P', 3),createTile('Q', 10),createTile('R', 1),createTile('S', 1),createTile('T', 3),createTile('U', 1),createTile('V', 4),createTile('W', 4),createTile('X', 8),createTile('Y', 4),createTile('Z', 10)};
 
         }
-        public static int[] getBag() {
-            return new int[]{1, 2, 3, 4, 5};
+        public static  Bag getBag() 
+        {
+            if(bag==null)
+            {
+                bag=new Bag();
+            }
+            return bag;
+            
         }
         public Tile getRand(){
             boolean flag = true;
@@ -86,6 +93,9 @@ public class Tile {
                 count+=x;
             }
             return count;
+        }
+        public int[] getQuantities() {
+            return this.Letters.clone();
         }
     }
 }
