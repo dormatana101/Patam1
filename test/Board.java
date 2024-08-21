@@ -1,11 +1,16 @@
 package test;
 
+import java.io.Console;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List; 
+import java.util.List;
+import javax.imageio.plugins.bmp.BMPImageWriteParam;
+
 public  class Board {
     public Tile[][] board=null;
     private static Board boardInstance = null;
+    private boolean IsFirstTime=true;
     ArrayList<int[]> doubleLetterAqua;
     ArrayList<int[]> tripleLetterBlue;
     ArrayList<int[]> doubleWordYellow;
@@ -87,9 +92,9 @@ public  class Board {
             new int[]{13, 9}
         ));
     }
-    public static Board createBoard() {
-        return new Board();
-    }
+    // public static Board createBoard() {
+    //     return new Board();
+    // }
     public static Board getBoard(){
             if(boardInstance==null)
             {
@@ -107,11 +112,82 @@ public  class Board {
         return copy;
     }
     public boolean boardLegal(Word w){
+        boolean findNeighbor=false;
         if(CheckBoundries(w) == false)
         {
             return false; // check boundries
         }
-        if(IsEmpty(this.board)){ // check first word in star
+        
+        if(!IsFirstTime)
+        {
+            if(w.vertical)
+            {
+                for (int i=0;i<w.tiles.length;i++){
+                    if (i==0 && w.row!=0){
+                         if(this.board[w.row-1][w.col]!=null)
+                                findNeighbor=true;
+                    }
+                    if (i==w.tiles.length-1 && w.row!=14){
+                        if(this.board[w.row+i+1][w.col]!=null)
+                                findNeighbor=true;
+                    }
+                    if(w.col!=0){
+                        if(this.board[w.row+i][w.col-1]!=null)
+                                findNeighbor=true;
+                    }
+                    if(w.col!=14){
+                        if(this.board[w.row+i][w.col+1]!=null)
+                                findNeighbor=true;
+                    }
+                }
+                
+            }
+            else
+            {
+                for (int i=0;i<w.tiles.length;i++){
+                    if (i==0 && w.col!=0){
+                        if(this.board[w.row][w.col-1]!=null)
+                               findNeighbor=true;
+                   }
+                   if (i==w.tiles.length-1 && w.col!=14){
+                       if(this.board[w.row][w.col+i+1]!=null)
+                               findNeighbor=true;
+                   }
+                   if(w.row!=0){
+                       if(this.board[w.row-1][w.col+i]!=null)
+                               findNeighbor=true;
+                   }
+                   if(w.row!=14){
+                       if(this.board[w.row+1][w.col+i]!=null)
+                               findNeighbor=true;
+                   }
+
+
+                }
+            }
+            if(!findNeighbor){
+                return false;
+            }
+        }
+        for(int i=0;i<w.tiles.length;i++)
+        {
+            if(w.vertical)
+            {
+                if(w.tiles[i]==null && this.board[w.row+i][w.col]==null)
+                {
+                    return false;
+                }
+            }
+            else 
+            {
+                if(w.tiles[i]==null && this.board[w.row][w.col+i]==null)
+                {
+                    return false;
+                }
+            }
+        }
+        if(IsEmpty(this.board))
+        { // check first word in star
             if(w.vertical)
             {
                 if(w.col!=7 || w.row>7 || w.tiles.length+w.row <7) // check boundries
@@ -177,6 +253,14 @@ public  class Board {
         }
         return true;
     }
+    public static boolean containsArray(List<int[]> list, int[] targetArray) {
+        for (int[] array : list) {
+            if (Arrays.equals(array, targetArray)) {
+                return true;
+            }
+        }
+        return false;
+    }
     public boolean dictionaryLegal(Word w){
         return true;
     }
@@ -203,7 +287,6 @@ public  class Board {
         Word W_push;
         int j;
         int h;
-        int col ;
         W_push=new Word(w.tiles, w.row, w.col, w.vertical);
         NewWord.add(W_push);
         if(w.vertical)
@@ -230,8 +313,8 @@ public  class Board {
                 for (int i=0; i<w.tiles.length;i++)
                 {
                     if(w.tiles[i]!= null){
-                        if ((w.col>=1 && this.board[w.row+i][w.col-1]!=null)||
-                        (w.col<14 && this.board[w.row+i][w.col+1]!=null)){
+                        if ((w.col>=1 && this.board[w.row+i][w.col-1]!=null && w.tiles[i]!=null)||
+                        (w.col<14 && this.board[w.row+i][w.col+1]!=null && w.tiles[i]!=null)){
                             for (j=0; w.col-j>=0 && this.board[w.row+i][w.col-j]!=null;j++);
                             j--;
                             
@@ -239,7 +322,7 @@ public  class Board {
                                 t.add(this.board[w.row+i][h]);
                             }
                             t_final=copyArray(t);
-                            W_push=new Word(t_final, w.col-j, h-1, false);
+                            W_push=new Word(t_final,w.row+i , w.col-j, false);
                             NewWord.add(W_push);
                             t.clear();
                         }
@@ -272,21 +355,20 @@ public  class Board {
             //else {
                 for (int i=0; i<w.tiles.length;i++)
                 {
-                    if(w.tiles[i]!= null){
-                        if ((w.row>=1 && this.board[w.row-1][w.col+i]!=null)||
-                        (w.row<14 && this.board[w.row+1][w.col+i]!=null)){
-                            for (j=1; w.row-j>=0 && this.board[w.row-j][w.col+i]!=null;j++);
+                        if ((w.row>=1 && this.board[w.row-1][w.col+i]!=null && w.tiles[i]!=null )||
+                        (w.row<14 && this.board[w.row+1][w.col+i]!=null && w.tiles[i]!=null)){
+                            for (j=0; w.row-j>=0 && this.board[w.row-j][w.col+i]!=null;j++);
+
                             j--;
-                            col =w.col+i;
+                            
                             for (h=w.row-j;h<=14 && this.board[h][w.col+i]!=null ;h++){
                                 t.add(this.board[h][w.col+i]);
                             }
                             t_final=copyArray(t);
-                            W_push=new Word(t_final, w.row-j, col, true);
+                            W_push=new Word(t_final, w.row-j, w.col+i, true);
                             NewWord.add(W_push);
                             t.clear();
                         }
-                    }
                 }
           //  }
         }
@@ -306,23 +388,15 @@ public  class Board {
             return false;
         if(w.vertical)
         {
-            if(w.row+w.tiles.length>=15)
+            if(w.row+w.tiles.length>15)
                 return false;
             
         }
         else{
-            if(w.col+w.tiles.length>=15)
+            if(w.col+w.tiles.length>15)
                 return false;
         }
         return true;
-    }
-    public static boolean containsArray(List<int[]> list, int[] targetArray) {
-        for (int[] array : list) {
-            if (Arrays.equals(array, targetArray)) {
-                return true;
-            }
-        }
-        return false;
     }
     public int getScore(Word w){
         int totalSum=0;
@@ -342,16 +416,18 @@ public  class Board {
                         words.get(i).tiles[j]=this.board[x][y];
                     }
                     int[] a={x,y};
-                    if(containsArray(tripleLetterBlue, a)){
+                    if(containsArray(tripleLetterBlue,a)){
                         sum+=words.get(i).tiles[j].int_score*3;
                     }
-                    else if(containsArray(doubleLetterAqua, a)){
+                    else if(containsArray(doubleLetterAqua,a)){
                         sum+=words.get(i).tiles[j].int_score*2;
                     }
-                    else if(containsArray(doubleWordYellow, a)){
+                    else if(containsArray(doubleWordYellow,a)){
+                        sum+=words.get(i).tiles[j].int_score;
                         scalar*=2;
                     }
-                    else if(containsArray(tripleWordRed, a)){
+                    else if(containsArray(tripleWordRed,a)){
+                        sum+=words.get(i).tiles[j].int_score;
                         scalar*=3;
                     }
                     else{
@@ -367,28 +443,28 @@ public  class Board {
                 {
                     words.get(i).tiles[j]=this.board[x][y];
                 }
-                if(containsArray(tripleLetterBlue, a)){
+                if(containsArray(tripleLetterBlue,a)){
                     sum+=words.get(i).tiles[j].int_score*3;
                 }
-                else if(containsArray(doubleLetterAqua, a)){
+                else if(containsArray(doubleLetterAqua,a)){
                     sum+=words.get(i).tiles[j].int_score*2;
                 }
-                else if(containsArray(doubleWordYellow, a)){
+                else if(containsArray(doubleWordYellow,a)){
+                    sum+=words.get(i).tiles[j].int_score;
                     scalar*=2;
-                    sum+=words.get(i).tiles[j].int_score;
                 }
-                else if(containsArray(tripleWordRed, a)){
-                    scalar*=3;
+                else if(containsArray(tripleWordRed,a)){
                     sum+=words.get(i).tiles[j].int_score;
+                    scalar*=3;
                 }
                 else{
                     sum+=words.get(i).tiles[j].int_score;
                 }
             }
         }
-            // if(IsEmpty(this.board)){
-            //     scalar*=2;
-            // }
+            if(IsFirstTime){
+                scalar*=2;
+            }
             sum*=scalar;
             totalSum+=sum;
             sum=0;
@@ -400,29 +476,30 @@ public  class Board {
     }
     public int tryPlaceWord(Word w){
         int totalscore=0;
-        int scalar =1;
-        if(IsEmpty(this.board)){
-            scalar=2;  
-        }
+        
+
         if (dictionaryLegal(w) && boardLegal(w)){
             if(w.vertical)
             {
                 for(int i=0;i<w.tiles.length;i++)
                 {
-                    if(w.tiles[i]!=null)
+                    if(w.tiles[i]!=null){
                         this.board[w.row+i][w.col]=w.tiles[i];
+                    }
                 }
             }
             else
             {
                 for(int i=0;i<w.tiles.length;i++)
                 {
-                    if(w.tiles[i]!=null)
+                    if(w.tiles[i]!=null){
                         this.board[w.row][w.col+i]=w.tiles[i];
+                    }
+                    
                 }
             }
             totalscore= getScore(w);
-            totalscore*=scalar;
+            IsFirstTime=false;
           return totalscore;  
         }    
         return 0;
